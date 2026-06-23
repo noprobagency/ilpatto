@@ -7,6 +7,7 @@
 
 import { motion } from 'framer-motion'
 import Sentiero from '../Progress/Sentiero'
+import MechanismCards from '../Mechanisms/MechanismCards'
 import type { DerivedState, Patto } from '../../lib/types'
 import styles from './Daily.module.css'
 
@@ -56,6 +57,8 @@ export default function Daily({ patto, derived, now, onShip }: DailyProps) {
           <strong className="tabular">Giorno {derived.dayNumber}</strong> di{' '}
           {patto.durationDays}
         </p>
+
+        {derived.shippableToday && <MechanismCards patto={patto} />}
 
         <div className={styles.shipZone}>
           {derived.shippableToday ? (

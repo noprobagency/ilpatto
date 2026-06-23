@@ -11,10 +11,15 @@
   margin: 0;
 }
 
-html,
+/*
+ * Grow with content and let the page scroll when a screen is tall (e.g. the
+ * Daily with the mechanism cards). min-height (not height) means short screens
+ * still fill the viewport and center, tall ones flow and scroll. dvh keeps it
+ * correct on mobile with a collapsing URL bar.
+ */
 body,
 #root {
-  height: 100%;
+  min-height: 100dvh;
 }
 
 html {
