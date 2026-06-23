@@ -1,0 +1,131 @@
+/*
+ * Dev-only debug menu. Deliberately dark so it never blends with the light app
+ * and reads unmistakably as a tool. Fixed bottom-left, collapsible, high z.
+ * Mounted only under import.meta.env.DEV — never in the production build.
+ */
+
+.bar {
+  position: fixed;
+  left: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 9999;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #f4f5f7;
+  max-width: min(360px, calc(100vw - 24px));
+}
+
+.handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(20, 18, 14, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f4f5f7;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.8);
+}
+
+.handleState {
+  color: #9aa0aa;
+}
+
+.chev {
+  margin-left: 4px;
+  color: #9aa0aa;
+}
+
+.panel {
+  margin-bottom: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(20, 18, 14, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.state {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 12px;
+  font-size: 11px;
+}
+
+.k {
+  color: #9aa0aa;
+}
+
+.v {
+  color: #f4f5f7;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn {
+  padding: 6px 10px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f4f5f7;
+  font-size: 11px;
+  font-family: inherit;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.danger {
+  border-color: rgba(242, 180, 65, 0.4);
+  color: var(--accent-strong);
+}
+
+.goGroup {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.input {
+  width: 48px;
+  padding: 6px 8px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f4f5f7;
+  font-size: 11px;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.empty {
+  font-size: 11px;
+  color: #9aa0aa;
+}

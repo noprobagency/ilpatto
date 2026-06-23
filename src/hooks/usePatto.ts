@@ -9,10 +9,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
+  addDays,
   applyShip,
   applySkipDay,
   createSealedPatto,
+  diffDays,
   evaluate,
+  getPattoDay,
   reconcile,
 } from '../lib/time'
 import {
@@ -34,8 +37,12 @@ export interface UsePatto {
   seal: (input: SealInput) => void
   ship: () => void
   restart: () => void
-  /** Dev-only; no-op in production builds. */
+  /** Dev-only; all no-ops in production builds. */
   skipDay: () => void
+  stepBackDay: () => void
+  /** Jump to day N with the previous N-1 days shipped, ready to ship day N. */
+  goToDay: (n: number) => void
+  forceBroken: () => void
 }
 
 export function usePatto(): UsePatto {
@@ -90,6 +97,52 @@ export function usePatto(): UsePatto {
     })
   }, [])
 
+  // Dev: step the simulated clock back one patto-day (via devDayOffset).
+  const stepBackDay = useCallback(() => {
+    if (!import.meta.env.DEV) return
+    setPattoState((current) => {
+      if (!current) return current
+      const next = { ...current, devDayOffset: (current.devDayOffset ?? 0) - 1 }
+      savePatto(next)
+      return next
+    })
+  }, [])
+
+  // Dev: jump straight to day N — N-1 days shipped, ready to ship day N. The
+  // clock part still goes through devDayOffset so it stays time-faithful.
+  const goToDay = useCallback(
+    (n: number) => {
+      if (!import.meta.env.DEV) return
+      setPattoState((current) => {
+        if (!current) return current
+        const day = Math.min(Math.max(Math.round(n), 1), current.durationDays)
+        const target = addDays(current.startPattoDate, day - 1)
+        const offset = diffDays(target, getPattoDay(now, 0))
+        const next: Patto = {
+          ...current,
+          devDayOffset: offset,
+          shippedCount: day - 1,
+          lastShippedPattoDate: day >= 2 ? addDays(current.startPattoDate, day - 2) : null,
+          status: 'active',
+        }
+        savePatto(next)
+        return next
+      })
+    },
+    [now],
+  )
+
+  // Dev: force the broken end state to inspect that screen immediately.
+  const forceBroken = useCallback(() => {
+    if (!import.meta.env.DEV) return
+    setPattoState((current) => {
+      if (!current) return current
+      const next: Patto = { ...current, status: 'broken' }
+      savePatto(next)
+      return next
+    })
+  }, [])
+
   return {
     patto,
     derived,
@@ -100,5 +153,8 @@ export function usePatto(): UsePatto {
     ship,
     restart,
     skipDay,
+    stepBackDay,
+    goToDay,
+    forceBroken,
   }
 }

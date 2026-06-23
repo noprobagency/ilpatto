@@ -3,18 +3,21 @@
  *
  * Phase 3 ships the real Daily screen + Il Sentiero. Completed/broken are still
  * minimal placeholders here (Phase 6 makes them premium end states with the
- * anti-abandon relaunch).
+ * anti-abandon relaunch). The dev-only debug menu is mounted persistently below
+ * every screen (excluded from production builds).
  */
 
+import type { ReactNode } from 'react'
 import { usePatto } from './hooks/usePatto'
 import Onboarding from './features/Onboarding/Onboarding'
 import Daily from './features/Daily/Daily'
 import Sentiero from './features/Progress/Sentiero'
+import DebugMenu from './features/Debug/DebugMenu'
 import styles from './App.module.css'
 
 export default function App() {
-  const { patto, derived, storageAvailable, isDev, now, seal, ship, restart, skipDay } =
-    usePatto()
+  const patto = usePatto()
+  const { derived, storageAvailable, isDev, now } = patto
 
   if (!storageAvailable) {
     return (
@@ -28,13 +31,13 @@ export default function App() {
     )
   }
 
-  if (!patto || !derived) {
-    return <Onboarding onSeal={seal} />
-  }
+  let screen: ReactNode
 
-  if (derived.view === 'completed' || derived.view === 'broken') {
+  if (!patto.patto || !derived) {
+    screen = <Onboarding onSeal={patto.seal} />
+  } else if (derived.view === 'completed' || derived.view === 'broken') {
     const completed = derived.view === 'completed'
-    return (
+    screen = (
       <main className={styles.shell}>
         <span className={styles.harnessTag}>
           {completed ? 'Completato' : 'Interrotto'} · finale definitivo in Fase 6
@@ -46,33 +49,39 @@ export default function App() {
               ? '14 giorni. Nemmeno uno saltato.'
               : `Hai spedito ${derived.shippedCount} ${
                   derived.shippedCount === 1 ? 'giorno' : 'giorni'
-                } su ${patto.durationDays}. Poi si è interrotto.`}
+                } su ${patto.patto.durationDays}. Poi si è interrotto.`}
           </p>
-          {completed && patto.why && <p className={styles.quiet}>« {patto.why} »</p>}
+          {completed && patto.patto.why && (
+            <p className={styles.quiet}>« {patto.patto.why} »</p>
+          )}
           <div className={styles.actions} style={{ justifyContent: 'center' }}>
-            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={restart}>
+            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={patto.restart}>
               {completed ? 'Inizia un nuovo patto' : 'Riparti dai 14'}
             </button>
-            {isDev && (
-              <button className={styles.btn} onClick={skipDay}>
-                Skip Day ⏭
-              </button>
-            )}
           </div>
         </div>
       </main>
     )
+  } else {
+    screen = (
+      <Daily patto={patto.patto} derived={derived} now={now} onShip={patto.ship} />
+    )
   }
 
   return (
-    <Daily
-      patto={patto}
-      derived={derived}
-      now={now}
-      isDev={isDev}
-      onShip={ship}
-      onSkipDay={skipDay}
-      onRestart={restart}
-    />
+    <>
+      {screen}
+      {isDev && (
+        <DebugMenu
+          patto={patto.patto}
+          derived={derived}
+          onSkip={patto.skipDay}
+          onBack={patto.stepBackDay}
+          onGoToDay={patto.goToDay}
+          onForceBroken={patto.forceBroken}
+          onReset={patto.restart}
+        />
+      )}
+    </>
   )
 }

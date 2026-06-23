@@ -14,10 +14,7 @@ interface DailyProps {
   patto: Patto
   derived: DerivedState
   now: Date
-  isDev: boolean
   onShip: () => void
-  onSkipDay: () => void
-  onRestart: () => void
 }
 
 /** "oggi" / "domani" / weekday for the next 08:00 unlock — informational only. */
@@ -41,15 +38,7 @@ function unlockCountdown(now: Date, unlock: Date): string {
   return `tra ~${Math.round(ms / 3_600_000)} h`
 }
 
-export default function Daily({
-  patto,
-  derived,
-  now,
-  isDev,
-  onShip,
-  onSkipDay,
-  onRestart,
-}: DailyProps) {
+export default function Daily({ patto, derived, now, onShip }: DailyProps) {
   return (
     <main className={styles.shell}>
       <div className={styles.inner}>
@@ -96,17 +85,6 @@ export default function Daily({
           )}
         </div>
       </div>
-
-      {isDev && (
-        <div className={styles.devBar}>
-          <button className={styles.devBtn} onClick={onSkipDay}>
-            Skip Day ⏭
-          </button>
-          <button className={styles.devBtn} onClick={onRestart}>
-            Reset
-          </button>
-        </div>
-      )}
     </main>
   )
 }
