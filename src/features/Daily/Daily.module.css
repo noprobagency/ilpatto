@@ -46,24 +46,77 @@
 }
 
 .counter {
-  font-size: var(--fs-sm);
-  color: var(--text-faint);
-  letter-spacing: 0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
-.counter strong {
-  color: var(--text-secondary);
+.counterNum {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+}
+
+.counterTotal {
+  font-size: 1.1rem;
   font-weight: 600;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.counterLabel {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+  align-self: center;
+  margin-left: var(--space-2);
 }
 
 /* Focal point #2 — the Ship button (the hot point of the screen) */
 .shipZone {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
   min-height: 96px;
   justify-content: center;
+}
+
+/* Sober light burst from the button on Ship — light does the work, not effects */
+.burst {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  margin-left: -60px;
+  margin-top: -60px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--accent-rgb), 0.55) 0%,
+    rgba(var(--accent-rgb), 0.18) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Day 14 only — a warm bloom that fills the screen, then hands off to Completed */
+.bloom {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 56%,
+    rgba(var(--accent-rgb), 0.45) 0%,
+    rgba(var(--accent-rgb), 0.16) 35%,
+    transparent 68%
+  );
 }
 
 .ship {
