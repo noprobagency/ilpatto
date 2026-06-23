@@ -1,22 +1,14 @@
 /*
- * Phase 1 verification harness.
+ * App shell — state-driven (PRD §6): onboarding → daily → completed | broken.
  *
- * This is NOT the final UI. It exposes the time engine + state machine so the
- * date logic can be falsified by hand (Seal → Ship → Skip Day → … → completed,
- * and the broken case by skipping a Ship) before any real screens are built.
- * Phases 2–6 replace this with Onboarding / Daily / Il Sentiero / cards / Ship.
+ * Phase 2 ships the real Onboarding. The "daily" branch below is still a
+ * temporary placeholder that exposes Ship / Skip Day / Reset so the full flow
+ * stays testable; Phase 3 replaces it with the real Daily screen + Il Sentiero.
  */
 
 import { usePatto } from './hooks/usePatto'
-import type { SealInput } from './lib/types'
+import Onboarding from './features/Onboarding/Onboarding'
 import styles from './App.module.css'
-
-const DEFAULT_SEAL: SealInput = {
-  protocolName: 'Il Patto',
-  trigger: 'apro il laptop la mattina',
-  action: 'scrivo una riga di codice',
-  why: 'voglio diventare uno che spedisce',
-}
 
 function fmtTime(d: Date): string {
   return d.toLocaleString('it-IT', {
@@ -44,113 +36,98 @@ export default function App() {
     )
   }
 
+  if (!patto || !derived) {
+    return <Onboarding onSeal={seal} />
+  }
+
+  // Temporary Daily placeholder (replaced by Phase 3).
   return (
     <main className={styles.shell}>
-      <span className={styles.harnessTag}>Fase 1 · verifica motore temporale</span>
+      <span className={styles.harnessTag}>Fase 3 (placeholder) · Daily &amp; Sentiero in arrivo</span>
 
-      {!patto || !derived ? (
-        <div className={styles.card}>
-          <p className={styles.protocol}>Nessun patto attivo</p>
-          <p className={styles.pact}>
-            Sigilla un patto di prova per iniziare a verificare la logica delle
-            date.
-          </p>
-          <div className={styles.actions}>
-            <button
-              className={`${styles.btn} ${styles.btnPrimary}`}
-              onClick={() => seal(DEFAULT_SEAL)}
-            >
-              Sigilla patto di prova
-            </button>
+      <div className={styles.card}>
+        <span className={styles.badge} data-status={derived.status}>
+          {derived.status}
+        </span>
+
+        <p className={styles.protocol}>{patto.protocolName}</p>
+        <p className={styles.pact}>
+          Se <em>{patto.trigger}</em>, allora <em>{patto.action}</em>.
+        </p>
+
+        <div className={styles.statusRow}>
+          <div className={styles.stat}>
+            <span className={styles.statLabel}>Giorno</span>
+            <span className={`${styles.statValue} tabular`}>
+              {Math.min(derived.dayNumber, patto.durationDays)} / {patto.durationDays}
+            </span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statLabel}>Spediti</span>
+            <span className={`${styles.statValue} tabular`}>{derived.shippedCount}</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statLabel}>Vista</span>
+            <span className={styles.statValue}>{derived.view}</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statLabel}>Giornata-patto</span>
+            <span className={`${styles.statValue} tabular`}>{derived.currentPattoDay}</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statLabel}>Prossimo sblocco</span>
+            <span className={styles.statValue}>{fmtTime(derived.nextUnlock)}</span>
           </div>
         </div>
-      ) : (
-        <div className={styles.card}>
-          <span className={styles.badge} data-status={derived.status}>
-            {derived.status}
-          </span>
 
-          <p className={styles.protocol}>{patto.protocolName}</p>
-          <p className={styles.pact}>
-            Se <em>{patto.trigger}</em>, allora <em>{patto.action}</em>.
-          </p>
-
-          <div className={styles.statusRow}>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Giorno</span>
-              <span className={`${styles.statValue} tabular`}>
-                {Math.min(derived.dayNumber, patto.durationDays)} / {patto.durationDays}
-              </span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Spediti</span>
-              <span className={`${styles.statValue} tabular`}>
-                {derived.shippedCount}
-              </span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Vista</span>
-              <span className={styles.statValue}>{derived.view}</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Giornata-patto</span>
-              <span className={`${styles.statValue} tabular`}>
-                {derived.currentPattoDay}
-              </span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>Prossimo sblocco</span>
-              <span className={styles.statValue}>{fmtTime(derived.nextUnlock)}</span>
-            </div>
-          </div>
-
-          <div className={styles.nodes}>
-            {derived.nodes.map((state, i) => (
-              <span key={i} className={styles.node} data-state={state} title={`Giorno ${i + 1}: ${state}`} />
-            ))}
-          </div>
-
-          {derived.view === 'shipped-today' && (
-            <p className={styles.quiet}>Spedito. Ci vediamo domani alle 8.</p>
-          )}
-          {derived.view === 'completed' && (
-            <p className={styles.quiet}>14 giorni. Nemmeno uno saltato.</p>
-          )}
-          {derived.view === 'broken' && (
-            <p className={styles.quiet}>
-              Hai spedito {derived.shippedCount} giorni su {patto.durationDays}. Poi
-              si è interrotto.
-            </p>
-          )}
-
-          <div className={styles.actions}>
-            <button
-              className={`${styles.btn} ${styles.btnPrimary}`}
-              onClick={ship}
-              disabled={!derived.shippableToday}
-            >
-              Ship
-            </button>
-            {isDev && (
-              <button className={styles.btn} onClick={skipDay}>
-                Skip Day ⏭
-              </button>
-            )}
-            <button className={`${styles.btn} ${styles.btnGhost}`} onClick={restart}>
-              Riparti / Reset
-            </button>
-          </div>
+        <div className={styles.nodes}>
+          {derived.nodes.map((state, i) => (
+            <span
+              key={i}
+              className={styles.node}
+              data-state={state}
+              title={`Giorno ${i + 1}: ${state}`}
+            />
+          ))}
         </div>
-      )}
+
+        {derived.view === 'shipped-today' && (
+          <p className={styles.quiet}>Spedito. Ci vediamo domani alle 8.</p>
+        )}
+        {derived.view === 'completed' && (
+          <p className={styles.quiet}>14 giorni. Nemmeno uno saltato.</p>
+        )}
+        {derived.view === 'broken' && (
+          <p className={styles.quiet}>
+            Hai spedito {derived.shippedCount}{' '}
+            {derived.shippedCount === 1 ? 'giorno' : 'giorni'} su {patto.durationDays}.
+            Poi si è interrotto.
+          </p>
+        )}
+
+        <div className={styles.actions}>
+          <button
+            className={`${styles.btn} ${styles.btnPrimary}`}
+            onClick={ship}
+            disabled={!derived.shippableToday}
+          >
+            Ship
+          </button>
+          {isDev && (
+            <button className={styles.btn} onClick={skipDay}>
+              Skip Day ⏭
+            </button>
+          )}
+          <button className={`${styles.btn} ${styles.btnGhost}`} onClick={restart}>
+            Riparti / Reset
+          </button>
+        </div>
+      </div>
 
       <details className={styles.debug}>
         <summary>Stato grezzo (debug)</summary>
         <pre>
-          {JSON.stringify(
-            { now: now.toISOString(), patto, derived: derived ?? null },
-            null,
-            2,
-          )}
+          {JSON.stringify({ now: now.toISOString(), patto, derived: derived ?? null }, null, 2)}
         </pre>
       </details>
     </main>

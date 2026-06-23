@@ -1,0 +1,278 @@
+.wrap {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-7) var(--space-4);
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-7) var(--space-6) var(--space-6);
+  overflow: hidden;
+}
+
+/* Step progress — slim segments that fill as you advance */
+.progress {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.segment {
+  height: 3px;
+  flex: 1;
+  border-radius: var(--radius-pill);
+  background: var(--node-off);
+  overflow: hidden;
+}
+
+.segmentFill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease);
+}
+
+/* A step: one message per screen */
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.kicker {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: var(--fs-body);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+.input::placeholder {
+  color: var(--text-faint);
+}
+
+.input:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-faint);
+}
+
+.textarea {
+  resize: none;
+  min-height: 84px;
+  line-height: 1.45;
+}
+
+/* Live preview of the pact forming */
+.preview {
+  font-size: 1.15rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  padding: var(--space-4);
+  background: var(--accent-faint);
+  border-radius: var(--radius);
+  letter-spacing: var(--tracking-tight);
+}
+
+.preview em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+
+.previewPlaceholder {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+.micro {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Seal step — the commitment */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.summaryName {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.summaryPact {
+  font-size: 1.2rem;
+  line-height: 1.45;
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+}
+
+.summaryPact em {
+  font-style: normal;
+  color: var(--accent-ink);
+}
+
+.summaryWhy {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.warning {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.warning strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.warnDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--glow-sm);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.btn {
+  padding: 13px 22px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: var(--fs-body);
+  border: 1px solid transparent;
+  transition: background var(--dur) var(--ease), transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur) var(--ease), color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btnPrimary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.btnPrimary:hover {
+  background: var(--accent-strong);
+  box-shadow: var(--glow-md);
+}
+
+.btnPrimary:disabled {
+  background: var(--node-off);
+  color: var(--text-faint);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btnGhost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btnGhost:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
+.btnSeal {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.05rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.skip {
+  background: transparent;
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.skip:hover {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: var(--space-6) var(--space-4) var(--space-5);
+  }
+}
