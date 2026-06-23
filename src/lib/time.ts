@@ -72,10 +72,27 @@ export function getPattoDay(now: Date, dayOffset = 0): PattoDate {
   return toLocalISODate(d)
 }
 
-/** The next real 08:00 local boundary from `now` (informational only). */
-export function nextUnlock(now: Date): Date {
-  const d = new Date(now.getTime())
-  if (d.getHours() >= UNLOCK_HOUR) d.setDate(d.getDate() + 1)
+/**
+ * The patto-day this patto considers `now` to be in, clamped up to the seal
+ * day. If we are in the pre-08:00 sliver before Day 1 officially begins
+ * (current patto-day < start), the seal day still counts as a *full* Day 1 and
+ * its window runs to the next day's 08:00 — protecting the first day's
+ * momentum (PRD principle: the early days are the most precious).
+ */
+export function effectivePattoDay(patto: Patto, now: Date): PattoDate {
+  const current = getPattoDay(now, patto.devDayOffset ?? 0)
+  return diffDays(current, patto.startPattoDate) < 0 ? patto.startPattoDate : current
+}
+
+/**
+ * The 08:00 local boundary that opens the day *after* `pattoDate` — i.e. when
+ * the next patto-day begins. Date-derived (no live clock), so it is correct
+ * even in the pre-08:00 sliver, where the next unlock is the following day's,
+ * not the imminent one (informational only).
+ */
+export function nextUnlockFor(pattoDate: PattoDate): Date {
+  const d = parseLocalISODate(pattoDate)
+  d.setDate(d.getDate() + 1)
   d.setHours(UNLOCK_HOUR, 0, 0, 0)
   return d
 }
@@ -101,16 +118,15 @@ function buildNodes(
  * is responsible for freezing terminal transitions (see `reconcile`).
  */
 export function evaluate(patto: Patto, now: Date): DerivedState {
-  const offset = patto.devDayOffset ?? 0
-  const currentPattoDay = getPattoDay(now, offset)
   const duration = patto.durationDays
   const shippedCount = patto.shippedCount
+  const currentPattoDay = effectivePattoDay(patto, now)
   // Clamped to the fixed window: "Day 192/14" must never happen.
   const dayNumber = Math.min(
     duration,
     Math.max(1, diffDays(currentPattoDay, patto.startPattoDate) + 1),
   )
-  const unlock = nextUnlock(now)
+  const unlock = nextUnlockFor(currentPattoDay)
 
   // Single builder so every branch derives nodes + focus consistently.
   // When a Ship is available the focus is the node about to light
@@ -156,24 +172,26 @@ export function evaluate(patto: Patto, now: Date): DerivedState {
   // A full patto-day was skipped → the path closes.
   if (gap > 1) return build('broken', 'broken', false)
 
-  // gap <= 0: the clock is at/behind the anchor. Reachable when the clock
-  // moved backward past the last Ship, or when startPattoDate is in the future
-  // (the device clock was fast at seal time and was later corrected) and
-  // nothing has shipped yet. Sit quietly, never punish — and never claim a
-  // Ship that didn't happen: if nothing was ever shipped this is `waiting`,
-  // not `shipped-today`. Self-heals to `active` once the clock reaches the seal.
-  return build(
-    patto.lastShippedPattoDate !== null ? 'shipped-today' : 'waiting',
-    'active',
-    false,
-  )
+  // gap <= 0: the clock is at/behind the anchor (it moved backward past the
+  // last Ship). lastShippedPattoDate is always non-null here — a never-shipped
+  // patto clamps up to `start`, which yields gap >= 1 — so this is the quiet
+  // "already shipped" state, never a false claim of a ship. Never punish.
+  return build('shipped-today', 'active', false)
 }
 
 /* ------------------------------------------------------------------ *
  * Pure transitions (the hook persists their results)
  * ------------------------------------------------------------------ */
 
-/** Build a fresh, sealed patto from onboarding input. Day 1 is not yet shipped. */
+/**
+ * Build a fresh, sealed patto from onboarding input. Day 1 is not yet shipped.
+ *
+ * The seal day always counts as a full Day 1, whatever the hour: we anchor to
+ * the seal's *calendar* date (not the 08:00-shifted patto-day). Sealing at,
+ * say, 06:00 therefore does NOT close Day 1 at 08:00 that same morning — the
+ * first rollover is the next day's, and `effectivePattoDay` folds the pre-08:00
+ * sliver into Day 1 so a Ship at seal time still counts.
+ */
 export function createSealedPatto(input: SealInput, now: Date): Patto {
   const why = input.why?.trim()
   const patto: Patto = {
@@ -182,7 +200,7 @@ export function createSealedPatto(input: SealInput, now: Date): Patto {
     trigger: input.trigger.trim(),
     action: input.action.trim(),
     durationDays: DURATION_DAYS,
-    startPattoDate: getPattoDay(now),
+    startPattoDate: toLocalISODate(now),
     lastShippedPattoDate: null,
     shippedCount: 0,
     status: 'active',
@@ -202,6 +220,8 @@ export function applyShip(patto: Patto, now: Date): Patto {
   const completed = shippedCount >= patto.durationDays
   return {
     ...patto,
+    // The effective patto-day (clamped to >= start), so a Ship made in the
+    // pre-08:00 sliver records Day 1 (start), not the day before it.
     lastShippedPattoDate: derived.currentPattoDay,
     shippedCount,
     status: completed ? 'completed' : 'active',

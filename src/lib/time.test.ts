@@ -12,7 +12,7 @@ import {
   diffDays,
   evaluate,
   getPattoDay,
-  nextUnlock,
+  nextUnlockFor,
   reconcile,
   toLocalISODate,
 } from './time'
@@ -70,16 +70,12 @@ describe('getPattoDay — 08:00 rollover', () => {
   })
 })
 
-describe('nextUnlock', () => {
-  it('is today 08:00 when before 08:00', () => {
-    expect(nextUnlock(local(2026, 6, 23, 6, 0)).getTime()).toBe(
-      local(2026, 6, 23, 8, 0).getTime(),
-    )
+describe('nextUnlockFor', () => {
+  it('returns 08:00 on the day after the given patto-day', () => {
+    expect(nextUnlockFor('2026-06-23').getTime()).toBe(local(2026, 6, 24, 8, 0).getTime())
   })
-  it('is tomorrow 08:00 when at/after 08:00', () => {
-    expect(nextUnlock(local(2026, 6, 23, 8, 0)).getTime()).toBe(
-      local(2026, 6, 24, 8, 0).getTime(),
-    )
+  it('crosses month boundaries', () => {
+    expect(nextUnlockFor('2026-06-30').getTime()).toBe(local(2026, 7, 1, 8, 0).getTime())
   })
 })
 
@@ -248,10 +244,10 @@ describe('node states reflect progress', () => {
   })
 })
 
-describe('seal before 08:00 (PRD §8: before 08:00 you belong to yesterday)', () => {
-  it('anchors Day 1 to the previous calendar date and is shippable immediately', () => {
+describe('seal before 08:00 always grants a full Day 1 (CHANGE 2)', () => {
+  it('anchors Day 1 to the seal calendar date (not the 08:00-shifted day)', () => {
     const patto = createSealedPatto(SEAL_INPUT, local(2026, 6, 23, 6, 0))
-    expect(patto.startPattoDate).toBe('2026-06-22')
+    expect(patto.startPattoDate).toBe('2026-06-23')
 
     const atSeal = evaluate(patto, local(2026, 6, 23, 6, 0))
     expect(atSeal.view).toBe('active')
@@ -259,23 +255,35 @@ describe('seal before 08:00 (PRD §8: before 08:00 you belong to yesterday)', ()
     expect(atSeal.dayNumber).toBe(1)
   })
 
-  it('the realistic flow works: ship at seal, cross 08:00, Day 2 unlocks', () => {
-    let patto = createSealedPatto(SEAL_INPUT, local(2026, 6, 23, 6, 0))
-    patto = applyShip(patto, local(2026, 6, 23, 6, 0)) // ship Day 1 in its window
-    const day2 = evaluate(patto, local(2026, 6, 23, 9, 0)) // after the 08:00 rollover
-    expect(day2.view).toBe('active')
-    expect(day2.shippableToday).toBe(true)
-    expect(day2.dayNumber).toBe(2)
+  it('stays Day 1 across the same-morning 08:00 — the first rollover is the next day', () => {
+    const patto = createSealedPatto(SEAL_INPUT, local(2026, 6, 23, 6, 0))
+    const sameMorning = evaluate(patto, local(2026, 6, 23, 9, 0)) // past 08:00, same day
+    expect(sameMorning.view).toBe('active')
+    expect(sameMorning.shippableToday).toBe(true)
+    expect(sameMorning.dayNumber).toBe(1)
+    // The next unlock is the NEXT day's 08:00 — a full cycle ahead.
+    expect(sameMorning.nextUnlock.getTime()).toBe(local(2026, 6, 24, 8, 0).getTime())
   })
 
-  // Documented sharp edge: the seal patto-day ends at the next 08:00 like any
-  // other, so an early-morning seal left unshipped closes at 08:00. The seal
-  // flow puts Ship directly in front of the user, so this only fires if they
-  // seal and walk away without shipping. Behaviour is uniform with the daily
-  // rule; flagged for a possible future product softening.
-  it('an unshipped pre-08:00 seal closes at the next 08:00 (uniform daily rule)', () => {
+  it('ship at seal counts for Day 1; Day 2 unlocks a full cycle later', () => {
+    let patto = createSealedPatto(SEAL_INPUT, local(2026, 6, 23, 6, 0))
+    patto = applyShip(patto, local(2026, 6, 23, 6, 0))
+    expect(patto.shippedCount).toBe(1)
+    // Same morning, past 08:00: Day 1 is done (shipped-today), NOT Day 2.
+    const sameMorning = evaluate(patto, local(2026, 6, 23, 9, 0))
+    expect(sameMorning.view).toBe('shipped-today')
+    expect(sameMorning.dayNumber).toBe(1)
+    // Day 2 only the next day at 08:00.
+    const nextDay = evaluate(patto, local(2026, 6, 24, 9, 0))
+    expect(nextDay.view).toBe('active')
+    expect(nextDay.shippableToday).toBe(true)
+    expect(nextDay.dayNumber).toBe(2)
+  })
+
+  it('an unshipped pre-08:00 seal has the full day; it breaks only the next morning', () => {
     const patto = createSealedPatto(SEAL_INPUT, local(2026, 6, 23, 6, 0))
-    expect(evaluate(patto, local(2026, 6, 23, 9, 0)).view).toBe('broken')
+    expect(evaluate(patto, local(2026, 6, 23, 9, 0)).view).toBe('active') // still Day 1
+    expect(evaluate(patto, local(2026, 6, 24, 9, 0)).view).toBe('broken') // window closed
   })
 })
 
@@ -420,24 +428,20 @@ describe('currentDayIndex always points at the node in focus', () => {
   })
 })
 
-describe('waiting view — clock behind the seal, nothing shipped', () => {
-  it('never claims a ship that did not happen, and self-heals to active', () => {
-    // Device clock was fast at seal → startPattoDate in the "future".
+describe('clock behind the seal day clamps to a full Day 1 (no false "shipped")', () => {
+  it('a corrected fast clock shows Day 1 active and never claims a ship', () => {
+    // Device clock was 2 days fast at seal → startPattoDate in the "future".
     const patto = createSealedPatto(SEAL_INPUT, local(2026, 6, 25, 10))
     expect(patto.startPattoDate).toBe('2026-06-25')
 
-    // Clock corrected backward: nothing to do, but do not say "shipped".
-    const before = evaluate(patto, local(2026, 6, 23, 10))
-    expect(before.view).toBe('waiting')
-    expect(before.shippableToday).toBe(false)
-    expect(before.shippedCount).toBe(0)
+    // Clock corrected backward to the true date: still Day 1, shippable, 0 shipped.
+    const d = evaluate(patto, local(2026, 6, 23, 10))
+    expect(d.view).toBe('active')
+    expect(d.shippableToday).toBe(true)
+    expect(d.dayNumber).toBe(1)
+    expect(d.shippedCount).toBe(0)
     // reconcile must NOT freeze it as broken.
     expect(reconcile(patto, local(2026, 6, 23, 10))).toBe(patto)
-
-    // Once the clock reaches the seal day, Day 1 becomes shippable.
-    const healed = evaluate(patto, local(2026, 6, 25, 10))
-    expect(healed.view).toBe('active')
-    expect(healed.shippableToday).toBe(true)
   })
 })
 

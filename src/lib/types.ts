@@ -51,14 +51,14 @@ export interface DerivedState {
    * What screen to show.
    * - `active`        — Ship is available now.
    * - `shipped-today` — already shipped for this patto-day; quiet until 08:00.
-   * - `waiting`       — active but nothing to do yet (never shipped and the
-   *                     clock resolves to before the seal day — a corrected
-   *                     fast clock). Never claims a ship that didn't happen.
    * - `completed`     — 14 days done. - `broken` — a day was missed.
    */
-  view: 'active' | 'shipped-today' | 'waiting' | 'completed' | 'broken'
+  view: 'active' | 'shipped-today' | 'completed' | 'broken'
   status: PattoStatus
-  /** The patto-day "now" resolves to (08:00 rollover + dev offset applied). */
+  /**
+   * The patto-day "now" resolves to: the 08:00-rollover date (+ dev offset),
+   * clamped up to the seal day so the seal day always reads as Day 1.
+   */
   currentPattoDay: PattoDate
   /** 1-based day number since the seal, clamped to [1, durationDays]. */
   dayNumber: number

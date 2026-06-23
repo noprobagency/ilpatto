@@ -113,9 +113,6 @@ export default function App() {
           {derived.view === 'shipped-today' && (
             <p className={styles.quiet}>Spedito. Ci vediamo domani alle 8.</p>
           )}
-          {derived.view === 'waiting' && (
-            <p className={styles.quiet}>In attesa dell'inizio del patto.</p>
-          )}
           {derived.view === 'completed' && (
             <p className={styles.quiet}>14 giorni. Nemmeno uno saltato.</p>
           )}
