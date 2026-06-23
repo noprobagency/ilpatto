@@ -37,7 +37,7 @@ export interface UsePatto {
   seal: (input: SealInput) => void
   ship: () => void
   restart: () => void
-  /** Dev-only; all no-ops in production builds. */
+  /** Debug-menu actions (reachable only through the gated debug panel). */
   skipDay: () => void
   stepBackDay: () => void
   /** Jump to day N with the previous N-1 days shipped, ready to ship day N. */
@@ -88,7 +88,6 @@ export function usePatto(): UsePatto {
   const restart = useCallback(() => persist(null), [persist])
 
   const skipDay = useCallback(() => {
-    if (!import.meta.env.DEV) return
     setPattoState((current) => {
       if (!current) return current
       const next = applySkipDay(current)
@@ -97,9 +96,8 @@ export function usePatto(): UsePatto {
     })
   }, [])
 
-  // Dev: step the simulated clock back one patto-day (via devDayOffset).
+  // Step the simulated clock back one patto-day (via devDayOffset).
   const stepBackDay = useCallback(() => {
-    if (!import.meta.env.DEV) return
     setPattoState((current) => {
       if (!current) return current
       const next = { ...current, devDayOffset: (current.devDayOffset ?? 0) - 1 }
@@ -108,11 +106,10 @@ export function usePatto(): UsePatto {
     })
   }, [])
 
-  // Dev: jump straight to day N — N-1 days shipped, ready to ship day N. The
-  // clock part still goes through devDayOffset so it stays time-faithful.
+  // Jump straight to day N — N-1 days shipped, ready to ship day N. The clock
+  // part still goes through devDayOffset so it stays time-faithful.
   const goToDay = useCallback(
     (n: number) => {
-      if (!import.meta.env.DEV) return
       setPattoState((current) => {
         if (!current) return current
         const day = Math.min(Math.max(Math.round(n), 1), current.durationDays)
@@ -132,9 +129,8 @@ export function usePatto(): UsePatto {
     [now],
   )
 
-  // Dev: force the broken end state to inspect that screen immediately.
+  // Force the broken end state to inspect that screen immediately.
   const forceBroken = useCallback(() => {
-    if (!import.meta.env.DEV) return
     setPattoState((current) => {
       if (!current) return current
       const next: Patto = { ...current, status: 'broken' }

@@ -17,6 +17,8 @@ interface DebugMenuProps {
   onGoToDay: (n: number) => void
   onForceBroken: () => void
   onReset: () => void
+  /** Forget the unlock (hides the panel until re-unlocked via the secret key). */
+  onDisable: () => void
 }
 
 function fmt(d: Date): string {
@@ -46,6 +48,7 @@ export default function DebugMenu({
   onGoToDay,
   onForceBroken,
   onReset,
+  onDisable,
 }: DebugMenuProps) {
   const [open, setOpen] = useState(false)
   const [dayInput, setDayInput] = useState('')
@@ -111,6 +114,9 @@ export default function DebugMenu({
               </button>
             </div>
           )}
+          <button type="button" className={styles.disable} onClick={onDisable}>
+            Disattiva debug
+          </button>
         </div>
       )}
 

@@ -3,12 +3,13 @@
  *
  * Phase 3 ships the real Daily screen + Il Sentiero. Completed/broken are still
  * minimal placeholders here (Phase 6 makes them premium end states with the
- * anti-abandon relaunch). The dev-only debug menu is mounted persistently below
- * every screen (excluded from production builds).
+ * anti-abandon relaunch). The debug menu mounts in local dev always, and in
+ * production only when unlocked by the secret key (see lib/debugGate).
  */
 
-import type { ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { usePatto } from './hooks/usePatto'
+import { clearDebugUnlock, isDebugEnabled, persistDebugUnlock } from './lib/debugGate'
 import Onboarding from './features/Onboarding/Onboarding'
 import Daily from './features/Daily/Daily'
 import Sentiero from './features/Progress/Sentiero'
@@ -17,7 +18,17 @@ import styles from './App.module.css'
 
 export default function App() {
   const patto = usePatto()
-  const { derived, storageAvailable, isDev, now } = patto
+  const { derived, storageAvailable, now } = patto
+
+  // Debug gate — all hooks run before any early return.
+  const [debugEnabled, setDebugEnabled] = useState(isDebugEnabled)
+  useEffect(() => {
+    persistDebugUnlock()
+  }, [])
+  const disableDebug = useCallback(() => {
+    clearDebugUnlock()
+    setDebugEnabled(false)
+  }, [])
 
   if (!storageAvailable) {
     return (
@@ -71,7 +82,7 @@ export default function App() {
   return (
     <>
       {screen}
-      {isDev && (
+      {debugEnabled && (
         <DebugMenu
           patto={patto.patto}
           derived={derived}
@@ -80,6 +91,7 @@ export default function App() {
           onGoToDay={patto.goToDay}
           onForceBroken={patto.forceBroken}
           onReset={patto.restart}
+          onDisable={disableDebug}
         />
       )}
     </>
