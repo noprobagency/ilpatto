@@ -45,7 +45,7 @@
 }
 
 .pact em {
-  color: var(--accent);
+  color: var(--accent-ink);
   font-style: normal;
 }
 
@@ -85,12 +85,12 @@
 }
 
 .badge[data-status='active'] {
-  color: var(--accent);
+  color: var(--accent-ink);
   border-color: var(--accent-soft);
   background: var(--accent-faint);
 }
 .badge[data-status='completed'] {
-  color: var(--accent-strong);
+  color: var(--accent-ink);
   border-color: var(--accent-soft);
   background: var(--accent-soft);
 }
@@ -109,8 +109,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1px solid var(--border-strong);
-  background: transparent;
+  border: 1px solid var(--node-off-border);
+  background: var(--node-off);
   transition: all var(--dur) var(--ease);
 }
 
@@ -122,12 +122,12 @@
 
 .node[data-state='current'] {
   border-color: var(--accent);
-  background: var(--accent-soft);
+  background: var(--accent-faint);
   animation: breathe 2.4s var(--ease-in-out) infinite;
 }
 
 .node[data-state='future'] {
-  background: transparent;
+  background: var(--node-off);
 }
 
 @keyframes breathe {

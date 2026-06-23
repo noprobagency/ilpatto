@@ -1,38 +1,49 @@
 /*
- * Il Patto — design tokens (PRD §4)
- * Dark-first, premium, minimal. One warm accent that means "progress / lit".
- * Everything theme-able from here. Swap --accent to retarget the whole app
+ * Il Patto — design tokens (PRD §4, light theme).
+ * Premium, warm, minimal — light on paper, not a SaaS dashboard. One warm
+ * accent (amber) that means "progress / lit": on paper it *warms* rather than
+ * glows. Everything theme-able from here — swap --accent to retarget the app
  * (e.g. lime #A8E05F instead of the amber default).
  */
 
 :root {
-  /* ---- Surfaces & background ---- */
-  --bg-deep: #0e0f12; /* deepest, not pure black */
-  --bg-raise: #15171c; /* top of the ambient gradient */
-  --surface: rgba(255, 255, 255, 0.035); /* glass card fill */
-  --surface-strong: rgba(255, 255, 255, 0.06);
-  --surface-hover: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
+  color-scheme: light;
 
-  /* ---- Text ---- */
-  --text-primary: #f4f5f7; /* warm white, the focal point */
-  --text-secondary: #9aa0aa; /* attenuated */
-  --text-faint: #5a606b; /* future / inactive */
+  /* ---- Surfaces & background — warm cream paper, never pure or cold white ---- */
+  --bg-deep: #f2eee6; /* bottom of the page gradient (deeper cream) */
+  --bg-raise: #faf8f4; /* top of the gradient (lighter cream) */
+  --surface: #fffdf9; /* card paper, a touch brighter than the page */
+  --surface-strong: #fbf7ef; /* secondary fills, inputs */
+  --surface-hover: #f5efe5;
+  --border: rgba(26, 24, 20, 0.07); /* hairline, warm */
+  --border-strong: rgba(26, 24, 20, 0.12);
+
+  /* ---- Text — warm, very dark primary; attenuated secondary ---- */
+  --text-primary: #1a1814; /* the focal point */
+  --text-secondary: #635c50; /* attenuated, still AA on paper */
+  --text-faint: #776d5f; /* de-emphasised labels — still AA on paper */
 
   /* ---- Accent (progress / energy / "lit") ---- */
   --accent: #f2b441; /* warm amber */
   --accent-rgb: 242, 180, 65;
-  --accent-strong: #f7c463;
-  --accent-deep: #c98f23;
+  --accent-strong: #e9a626; /* hover / pressed fill */
+  --accent-deep: #c98f23; /* darker amber for borders / focus ring */
+  --accent-ink: #8a5a0f; /* amber used as *text* — AA on paper */
   --accent-contrast: #1a1206; /* text on top of a filled accent surface */
-  --accent-soft: rgba(242, 180, 65, 0.14);
-  --accent-faint: rgba(242, 180, 65, 0.07);
+  --accent-soft: rgba(242, 180, 65, 0.2);
+  --accent-faint: rgba(242, 180, 65, 0.1);
 
-  /* ---- Glow (light grows as you advance — never neon) ---- */
-  --glow-sm: 0 0 12px rgba(var(--accent-rgb), 0.35);
-  --glow-md: 0 0 22px rgba(var(--accent-rgb), 0.45);
-  --glow-lg: 0 0 40px rgba(var(--accent-rgb), 0.55);
+  /* ---- Glow — soft warm light on paper, never a neon halo ---- */
+  --glow-sm: 0 2px 10px rgba(var(--accent-rgb), 0.28);
+  --glow-md: 0 4px 18px rgba(var(--accent-rgb), 0.34);
+  --glow-lg: 0 8px 30px rgba(var(--accent-rgb), 0.4);
+
+  /* ---- Il Sentiero (path nodes; used from Phase 3) ---- */
+  --node-off: #e6dfd2; /* dim grey-cream on paper */
+  --node-off-border: rgba(26, 24, 20, 0.1);
+  --node-on: var(--accent); /* lit node, warm amber fill */
+  --segment-off: rgba(26, 24, 20, 0.08);
+  --segment-on: var(--accent);
 
   /* ---- Radii ---- */
   --radius-sm: 12px;
@@ -40,9 +51,11 @@
   --radius-lg: 20px;
   --radius-pill: 999px;
 
-  /* ---- Elevation ---- */
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 18px 40px -24px rgba(0, 0, 0, 0.8);
+  /* ---- Elevation — soft, diffuse shadows (not borders) ---- */
+  --shadow-card: 0 1px 2px rgba(26, 24, 20, 0.04),
+    0 14px 32px -16px rgba(26, 24, 20, 0.16);
+  --shadow-soft: 0 6px 22px -12px rgba(26, 24, 20, 0.2);
+  --shadow-pressed: 0 1px 2px rgba(26, 24, 20, 0.08) inset;
 
   /* ---- Spacing scale (generous) ---- */
   --space-1: 4px;
