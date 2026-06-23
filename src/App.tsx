@@ -13,7 +13,7 @@ import Sentiero from './features/Progress/Sentiero'
 import styles from './App.module.css'
 
 export default function App() {
-  const { patto, derived, storageAvailable, isDev, seal, ship, restart, skipDay } =
+  const { patto, derived, storageAvailable, isDev, now, seal, ship, restart, skipDay } =
     usePatto()
 
   if (!storageAvailable) {
@@ -68,6 +68,7 @@ export default function App() {
     <Daily
       patto={patto}
       derived={derived}
+      now={now}
       isDev={isDev}
       onShip={ship}
       onSkipDay={skipDay}

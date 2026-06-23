@@ -13,15 +13,38 @@ import styles from './Daily.module.css'
 interface DailyProps {
   patto: Patto
   derived: DerivedState
+  now: Date
   isDev: boolean
   onShip: () => void
   onSkipDay: () => void
   onRestart: () => void
 }
 
+/** "oggi" / "domani" / weekday for the next 08:00 unlock — informational only. */
+function unlockDayWord(now: Date, unlock: Date): string {
+  const a = new Date(now)
+  a.setHours(0, 0, 0, 0)
+  const b = new Date(unlock)
+  b.setHours(0, 0, 0, 0)
+  const diff = Math.round((b.getTime() - a.getTime()) / 86_400_000)
+  if (diff <= 0) return 'oggi'
+  if (diff === 1) return 'domani'
+  return unlock.toLocaleDateString('it-IT', { weekday: 'long' })
+}
+
+/** Soft relative countdown to the next unlock (purely informational). */
+function unlockCountdown(now: Date, unlock: Date): string {
+  const ms = unlock.getTime() - now.getTime()
+  if (ms <= 0) return 'a breve'
+  const minutes = Math.round(ms / 60_000)
+  if (minutes < 60) return `tra ~${minutes} min`
+  return `tra ~${Math.round(ms / 3_600_000)} h`
+}
+
 export default function Daily({
   patto,
   derived,
+  now,
   isDev,
   onShip,
   onSkipDay,
@@ -63,7 +86,12 @@ export default function Daily({
                 </svg>
               </span>
               <span className={styles.quietTitle}>Spedito.</span>
-              <span className={styles.quietSub}>Ci vediamo domani alle 8.</span>
+              <span className={styles.quietSub}>
+                Prossimo giorno {unlockDayWord(now, derived.nextUnlock)} alle 08:00
+              </span>
+              <span className={styles.countdown}>
+                {unlockCountdown(now, derived.nextUnlock)}
+              </span>
             </div>
           )}
         </div>

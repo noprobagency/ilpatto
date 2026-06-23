@@ -134,6 +134,18 @@
   color: var(--text-secondary);
 }
 
+.countdown {
+  margin-top: var(--space-2);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-faint);
+  color: var(--accent-ink);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Dev-only controls, unobtrusive */
 .devBar {
   position: fixed;
