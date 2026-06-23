@@ -1,0 +1,78 @@
+/*
+ * Il Patto — design tokens (PRD §4)
+ * Dark-first, premium, minimal. One warm accent that means "progress / lit".
+ * Everything theme-able from here. Swap --accent to retarget the whole app
+ * (e.g. lime #A8E05F instead of the amber default).
+ */
+
+:root {
+  /* ---- Surfaces & background ---- */
+  --bg-deep: #0e0f12; /* deepest, not pure black */
+  --bg-raise: #15171c; /* top of the ambient gradient */
+  --surface: rgba(255, 255, 255, 0.035); /* glass card fill */
+  --surface-strong: rgba(255, 255, 255, 0.06);
+  --surface-hover: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* ---- Text ---- */
+  --text-primary: #f4f5f7; /* warm white, the focal point */
+  --text-secondary: #9aa0aa; /* attenuated */
+  --text-faint: #5a606b; /* future / inactive */
+
+  /* ---- Accent (progress / energy / "lit") ---- */
+  --accent: #f2b441; /* warm amber */
+  --accent-rgb: 242, 180, 65;
+  --accent-strong: #f7c463;
+  --accent-deep: #c98f23;
+  --accent-contrast: #1a1206; /* text on top of a filled accent surface */
+  --accent-soft: rgba(242, 180, 65, 0.14);
+  --accent-faint: rgba(242, 180, 65, 0.07);
+
+  /* ---- Glow (light grows as you advance — never neon) ---- */
+  --glow-sm: 0 0 12px rgba(var(--accent-rgb), 0.35);
+  --glow-md: 0 0 22px rgba(var(--accent-rgb), 0.45);
+  --glow-lg: 0 0 40px rgba(var(--accent-rgb), 0.55);
+
+  /* ---- Radii ---- */
+  --radius-sm: 12px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  /* ---- Elevation ---- */
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 18px 40px -24px rgba(0, 0, 0, 0.8);
+
+  /* ---- Spacing scale (generous) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* ---- Typography ---- */
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --fs-display: clamp(2rem, 5vw, 3rem);
+  --fs-title: clamp(1.35rem, 3vw, 1.75rem);
+  --fs-body: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.75rem;
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.08em;
+
+  /* ---- Motion (controlled, premium, never bouncy) ---- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur: 260ms;
+  --dur-slow: 400ms;
+
+  /* ---- Layout ---- */
+  --content-max: 720px;
+}
