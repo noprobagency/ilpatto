@@ -44,6 +44,10 @@
   --node-on: var(--accent); /* lit node, warm amber fill */
   --segment-off: rgba(26, 24, 20, 0.08);
   --segment-on: var(--accent);
+  /* "spent" — the reached path on the broken screen: desaturated, de-energised
+     (visible, so you see how far you got, but the light has gone out) */
+  --node-spent: #b9ab90;
+  --segment-spent: #cdc4b1;
 
   /* ---- Radii ---- */
   --radius-sm: 12px;

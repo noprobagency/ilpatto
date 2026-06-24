@@ -26,9 +26,11 @@ const FRACTIONS = nodeLengthFractions(NODES)
 interface SentieroProps {
   nodes: NodeState[]
   shippedCount: number
+  /** Broken state: the reached path shows desaturated/de-energised, not lit. */
+  dimmed?: boolean
 }
 
-export default function Sentiero({ nodes, shippedCount }: SentieroProps) {
+export default function Sentiero({ nodes, shippedCount, dimmed = false }: SentieroProps) {
   const reduce = useReducedMotion()
   const litFraction = shippedCount > 0 ? FRACTIONS[Math.min(shippedCount, DURATION_DAYS) - 1] : 0
   const summit = NODES[NODES.length - 1]
@@ -36,7 +38,7 @@ export default function Sentiero({ nodes, shippedCount }: SentieroProps) {
   return (
     <div className={styles.wrap}>
       <svg
-        className={styles.svg}
+        className={dimmed ? `${styles.svg} ${styles.dimmed}` : styles.svg}
         viewBox={`0 0 ${SENTIERO_VIEWBOX.w} ${SENTIERO_VIEWBOX.h}`}
         role="img"
         aria-label={`Sentiero: ${shippedCount} di ${DURATION_DAYS} giorni spediti`}

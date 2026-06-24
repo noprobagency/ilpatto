@@ -12,7 +12,8 @@ import { usePatto } from './hooks/usePatto'
 import { clearDebugUnlock, isDebugEnabled, persistDebugUnlock } from './lib/debugGate'
 import Onboarding from './features/Onboarding/Onboarding'
 import Daily from './features/Daily/Daily'
-import Sentiero from './features/Progress/Sentiero'
+import Completed from './features/EndStates/Completed'
+import Broken from './features/EndStates/Broken'
 import DebugMenu from './features/Debug/DebugMenu'
 import styles from './App.module.css'
 
@@ -46,32 +47,17 @@ export default function App() {
 
   if (!patto.patto || !derived) {
     screen = <Onboarding onSeal={patto.seal} />
-  } else if (derived.view === 'completed' || derived.view === 'broken') {
-    const completed = derived.view === 'completed'
+  } else if (derived.view === 'completed') {
     screen = (
-      <main className={styles.shell}>
-        <span className={styles.harnessTag}>
-          {completed ? 'Completato' : 'Interrotto'} · finale definitivo in Fase 6
-        </span>
-        <div className={styles.card} style={{ textAlign: 'center' }}>
-          <Sentiero nodes={derived.nodes} shippedCount={derived.shippedCount} />
-          <p className={styles.pact}>
-            {completed
-              ? '14 giorni. Nemmeno uno saltato.'
-              : `Hai spedito ${derived.shippedCount} ${
-                  derived.shippedCount === 1 ? 'giorno' : 'giorni'
-                } su ${patto.patto.durationDays}. Poi si è interrotto.`}
-          </p>
-          {completed && patto.patto.why && (
-            <p className={styles.quiet}>« {patto.patto.why} »</p>
-          )}
-          <div className={styles.actions} style={{ justifyContent: 'center' }}>
-            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={patto.restart}>
-              {completed ? 'Inizia un nuovo patto' : 'Riparti dai 14'}
-            </button>
-          </div>
-        </div>
-      </main>
+      <Completed patto={patto.patto} derived={derived} onNewPact={patto.restart} />
+    )
+  } else if (derived.view === 'broken') {
+    screen = (
+      <Broken
+        patto={patto.patto}
+        derived={derived}
+        onRestartSamePact={patto.restartSamePact}
+      />
     )
   } else {
     screen = (

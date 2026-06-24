@@ -87,6 +87,18 @@
   }
 }
 
+/* Broken: the reached path desaturated and de-energised (the light went out) */
+.dimmed .lit {
+  stroke: var(--segment-spent);
+  filter: none;
+}
+
+.dimmed .nodeDone {
+  fill: var(--node-spent);
+  stroke: var(--node-spent);
+  filter: none;
+}
+
 /* The "flag" cap of the journey — Day 14 */
 .summit {
   fill: none;

@@ -36,7 +36,10 @@ export interface UsePatto {
   now: Date
   seal: (input: SealInput) => void
   ship: () => void
+  /** Clear everything and return to onboarding (a brand-new pact). */
   restart: () => void
+  /** Re-seal the SAME pact for a fresh 14 days (broken-screen relaunch). */
+  restartSamePact: () => void
   /** Debug-menu actions (reachable only through the gated debug panel). */
   skipDay: () => void
   stepBackDay: () => void
@@ -86,6 +89,25 @@ export function usePatto(): UsePatto {
   }, [now])
 
   const restart = useCallback(() => persist(null), [persist])
+
+  // Re-seal the same pact for a fresh 14 days — least-friction relaunch from
+  // the broken screen: one tap and you're back on Day 1, no re-typing.
+  const restartSamePact = useCallback(() => {
+    setPattoState((current) => {
+      if (!current) return current
+      const next = createSealedPatto(
+        {
+          protocolName: current.protocolName,
+          trigger: current.trigger,
+          action: current.action,
+          ...(current.why ? { why: current.why } : {}),
+        },
+        now,
+      )
+      savePatto(next)
+      return next
+    })
+  }, [now])
 
   const skipDay = useCallback(() => {
     setPattoState((current) => {
@@ -148,6 +170,7 @@ export function usePatto(): UsePatto {
     seal,
     ship,
     restart,
+    restartSamePact,
     skipDay,
     stepBackDay,
     goToDay,

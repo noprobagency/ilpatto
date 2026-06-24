@@ -1,0 +1,110 @@
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: var(--space-7) var(--space-4) var(--space-8);
+  text-align: center;
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--content-max);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.label {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.pathWrap {
+  width: 100%;
+  max-width: 600px;
+}
+
+.headline {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+  line-height: 1.25;
+  max-width: 16em;
+}
+
+.sub {
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 30em;
+}
+
+.whyCallout {
+  font-size: var(--fs-body);
+  font-style: italic;
+  color: var(--accent-ink);
+  background: var(--accent-faint);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius);
+  max-width: 28em;
+}
+
+/* The relaunch / new-pact CTA — the largest, warmest element on the screen.
+   It is to the end states what Ship is to the live days. */
+.ctaWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.cta {
+  padding: 21px 66px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: var(--glow-lg);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+
+.cta:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 40px rgba(var(--accent-rgb), 0.5);
+}
+
+.cta:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.ctaSub {
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+  max-width: 26em;
+  line-height: 1.5;
+}
+
+.pactReminder {
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+  max-width: 28em;
+  line-height: 1.5;
+}
+
+.pactReminder em {
+  font-style: normal;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
