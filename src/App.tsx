@@ -7,9 +7,14 @@
  * production only when unlocked by the secret key (see lib/debugGate).
  */
 
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { usePatto } from './hooks/usePatto'
-import { clearDebugUnlock, isDebugEnabled, persistDebugUnlock } from './lib/debugGate'
+import {
+  clearDebugUnlock,
+  isDebugEnabled,
+  persistDebugUnlock,
+  setDebugUnlock,
+} from './lib/debugGate'
 import Onboarding from './features/Onboarding/Onboarding'
 import Daily from './features/Daily/Daily'
 import Completed from './features/EndStates/Completed'
@@ -29,6 +34,23 @@ export default function App() {
   const disableDebug = useCallback(() => {
     clearDebugUnlock()
     setDebugEnabled(false)
+  }, [])
+
+  // In-app secret unlock for the installed PWA (no address bar): 5 quick taps
+  // on the top-left corner. Persists the flag and reveals the debug menu.
+  const tapsRef = useRef(0)
+  const tapTimerRef = useRef<number | undefined>(undefined)
+  const handleSecretTap = useCallback(() => {
+    tapsRef.current += 1
+    window.clearTimeout(tapTimerRef.current)
+    tapTimerRef.current = window.setTimeout(() => {
+      tapsRef.current = 0
+    }, 1500)
+    if (tapsRef.current >= 5) {
+      tapsRef.current = 0
+      setDebugUnlock()
+      setDebugEnabled(true)
+    }
   }, [])
 
   if (!storageAvailable) {
@@ -68,6 +90,26 @@ export default function App() {
   return (
     <>
       {screen}
+      {!debugEnabled && (
+        <button
+          aria-hidden="true"
+          tabIndex={-1}
+          onClick={handleSecretTap}
+          title=""
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: 44,
+            height: 44,
+            padding: 0,
+            opacity: 0,
+            background: 'transparent',
+            border: 'none',
+            zIndex: 9998,
+          }}
+        />
+      )}
       {debugEnabled && (
         <DebugMenu
           patto={patto.patto}

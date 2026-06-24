@@ -42,6 +42,19 @@ export function persistDebugUnlock(): void {
   }
 }
 
+/**
+ * Persist the unlock without a URL param — for the in-app secret gesture, so
+ * the debug menu is reachable inside an installed PWA (no address bar; on iOS
+ * the standalone app also has its own storage, separate from Safari).
+ */
+export function setDebugUnlock(): void {
+  try {
+    window.localStorage.setItem(DEBUG_FLAG, 'true')
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Forget the unlock (the "Disattiva debug" control). */
 export function clearDebugUnlock(): void {
   try {
