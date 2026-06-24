@@ -99,7 +99,7 @@
 }
 
 .danger {
-  border-color: rgba(242, 180, 65, 0.4);
+  border-color: rgba(var(--accent-rgb), 0.4);
   color: var(--accent-strong);
 }
 

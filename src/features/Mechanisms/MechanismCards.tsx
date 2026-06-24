@@ -96,11 +96,15 @@ export default function MechanismCards({ patto }: { patto: Patto }) {
           <button
             key={i}
             type="button"
-            className={`${styles.dot} ${i === active ? styles.dotActive : ''}`}
+            className={styles.dot}
             aria-label={`Vai al meccanismo ${i + 1}`}
             aria-current={i === active}
             onClick={() => goTo(i)}
-          />
+          >
+            <span
+              className={`${styles.dotInner} ${i === active ? styles.dotInnerActive : ''}`}
+            />
+          </button>
         ))}
       </div>
     </div>

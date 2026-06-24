@@ -12,6 +12,7 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import Sentiero from '../Progress/Sentiero'
 import type { DerivedState, Patto } from '../../lib/types'
+import { EASE } from '../../lib/motion'
 import styles from './EndStates.module.css'
 
 interface CompletedProps {
@@ -29,7 +30,7 @@ export default function Completed({ patto, derived, onNewPact }: CompletedProps)
       : {
           initial: { opacity: 0, y: 10 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] as const },
+          transition: { duration: 0.45, delay, ease: EASE },
         }
 
   return (

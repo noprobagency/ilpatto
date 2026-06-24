@@ -17,6 +17,7 @@ import Sentiero from '../Progress/Sentiero'
 import MechanismCards from '../Mechanisms/MechanismCards'
 import AnimatedNumber from '../../components/AnimatedNumber'
 import type { DerivedState, Patto } from '../../lib/types'
+import { EASE } from '../../lib/motion'
 import styles from './Daily.module.css'
 
 interface DailyProps {
@@ -73,9 +74,11 @@ export default function Daily({ patto, derived, now, onShip }: DailyProps) {
       setCelebrating(true)
       window.setTimeout(onShip, 750)
     } else {
-      // One of the thirteen — quick, never blocking.
+      // One of the thirteen — quick, never blocking. Under reduced motion the
+      // burst is skipped; the instant counter tick + lit node + "Spedito."
+      // still make it unmistakable that the Ship landed.
       vibrate(14)
-      setFlash((f) => f + 1)
+      if (!reduce) setFlash((f) => f + 1)
       onShip()
     }
   }
@@ -108,7 +111,7 @@ export default function Daily({ patto, derived, now, onShip }: DailyProps) {
               className={styles.burst}
               initial={{ scale: 0.5, opacity: 0.55 }}
               animate={{ scale: 2.2, opacity: 0 }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
+              transition={{ duration: 0.6, ease: EASE }}
               aria-hidden="true"
             />
           )}
@@ -128,7 +131,7 @@ export default function Daily({ patto, derived, now, onShip }: DailyProps) {
               className={styles.quiet}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reduce ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: reduce ? 0 : 0.35, ease: EASE }}
             >
               <span className={styles.quietMark} aria-hidden="true">
                 <svg viewBox="0 0 24 24">
@@ -152,7 +155,7 @@ export default function Daily({ patto, derived, now, onShip }: DailyProps) {
           className={styles.bloom}
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: [0, 0.9, 0], scale: 1.7 }}
-          transition={{ duration: 0.75, ease: 'easeOut' }}
+          transition={{ duration: 0.75, ease: EASE }}
           aria-hidden="true"
         />
       )}

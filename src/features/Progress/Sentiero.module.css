@@ -3,11 +3,27 @@
   margin: var(--space-2) 0;
 }
 
+/* Mobile vertical climb: cap the width so the tall portrait field is a
+   sensible height, and centre it. */
+.vertical {
+  max-width: 300px;
+  margin: var(--space-2) auto;
+}
+
 .svg {
   width: 100%;
   height: auto;
   display: block;
   overflow: visible; /* let node glow breathe past the viewBox */
+}
+
+/* The vertical climb has bigger nodes, so thicken the path to match. */
+.svg[data-orientation='v'] .track {
+  stroke-width: 4.5;
+}
+
+.svg[data-orientation='v'] .lit {
+  stroke-width: 6;
 }
 
 /* The faint continuous curve — the "truth" the node path rests on (PRD §5) */

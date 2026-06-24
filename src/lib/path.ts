@@ -15,6 +15,12 @@ export interface Point {
 export const SENTIERO_VIEWBOX = { w: 680, h: 240 }
 const PAD = { x: 46, top: 42, bottom: 50 }
 
+// Mobile: a taller portrait field for the vertical climb (day 1 at the bottom,
+// day 14 at the top), with big, well-spaced nodes.
+export const SENTIERO_VIEWBOX_V = { w: 320, h: 600 }
+const PAD_V = { top: 52, bottom: 52 }
+const WAVE_AMP = 72 // gentle horizontal sway, so the trail winds as it rises
+
 /** Round to 2 decimals to keep path strings compact. */
 const r = (n: number): number => Math.round(n * 100) / 100
 
@@ -33,6 +39,24 @@ export function sentieroNodes(count: number): Point[] {
     const fx = Math.pow(p, 1.35)
     const fy = 1 - Math.pow(1 - p, 1.7)
     return { x: r(x0 + (x1 - x0) * fx), y: r(yBottom - (yBottom - yTop) * fy) }
+  })
+}
+
+/**
+ * Mobile node positions: the path climbs vertically (day 1 bottom → day 14 top)
+ * with even, generous spacing and a gentle horizontal sway. Vertical reads as
+ * "salire", and the extra height lets the nodes be large and legible — the
+ * progress and the Ship light-up land where it matters most (the phone).
+ */
+export function sentieroNodesVertical(count: number): Point[] {
+  const yBottom = SENTIERO_VIEWBOX_V.h - PAD_V.bottom
+  const yTop = PAD_V.top
+  const cx = SENTIERO_VIEWBOX_V.w / 2
+  return Array.from({ length: count }, (_, i) => {
+    const p = count === 1 ? 0 : i / (count - 1)
+    const y = yBottom - (yBottom - yTop) * p
+    const x = cx + WAVE_AMP * Math.sin(p * Math.PI * 1.5)
+    return { x: r(x), y: r(y) }
   })
 }
 

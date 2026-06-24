@@ -12,6 +12,7 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { SealInput } from '../../lib/types'
+import { EASE } from '../../lib/motion'
 import styles from './Onboarding.module.css'
 
 const STEP_COUNT = 4
@@ -71,7 +72,7 @@ export default function Onboarding({ onSeal }: OnboardingProps) {
           key={step}
           initial={{ opacity: 0, x: reduce ? 0 : direction * 28 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.28, ease: EASE }}
           className={styles.step}
         >
             <span className={styles.kicker}>

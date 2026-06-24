@@ -11,6 +11,7 @@ import {
   useReducedMotion,
   useTransform,
 } from 'framer-motion'
+import { EASE } from '../lib/motion'
 
 interface AnimatedNumberProps {
   value: number
@@ -25,7 +26,7 @@ export default function AnimatedNumber({ value, className }: AnimatedNumberProps
   useEffect(() => {
     const controls = animate(mv, value, {
       duration: reduce ? 0 : 0.5,
-      ease: [0.22, 1, 0.36, 1],
+      ease: EASE,
     })
     return () => controls.stop()
   }, [value, reduce, mv])
