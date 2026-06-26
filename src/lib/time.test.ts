@@ -16,6 +16,7 @@ import {
   reconcile,
   toLocalISODate,
 } from './time'
+import { pactDisplay } from './types'
 import type { Patto, SealInput } from './types'
 
 /** Build a local Date (month is 1-based here for readability). */
@@ -24,8 +25,7 @@ const local = (y: number, mo: number, d: number, h = 12, mi = 0): Date =>
 
 const SEAL_INPUT: SealInput = {
   protocolName: 'Il Patto',
-  trigger: 'dopo il caffè',
-  action: 'scrivo una riga di codice',
+  pactText: 'scrivo una riga di codice ogni giorno',
 }
 
 describe('local-date primitives', () => {
@@ -99,13 +99,11 @@ describe('seal → Day 1', () => {
 
   it('trims input and falls back to a default name', () => {
     const patto = createSealedPatto(
-      { protocolName: '   ', trigger: ' x ', action: ' y ', why: '  ' },
+      { protocolName: '   ', pactText: '  scrivo una riga  ' },
       local(2026, 6, 23, 10),
     )
     expect(patto.protocolName).toBe('Il Patto')
-    expect(patto.trigger).toBe('x')
-    expect(patto.action).toBe('y')
-    expect('why' in patto).toBe(false)
+    expect(patto.pactText).toBe('scrivo una riga')
   })
 })
 
@@ -442,6 +440,20 @@ describe('clock behind the seal day clamps to a full Day 1 (no false "shipped")'
     expect(d.shippedCount).toBe(0)
     // reconcile must NOT freeze it as broken.
     expect(reconcile(patto, local(2026, 6, 23, 10))).toBe(patto)
+  })
+})
+
+describe('pactDisplay — free text (v1.1) with legacy fallback', () => {
+  it('prefers the free-text pact', () => {
+    expect(pactDisplay({ pactText: '  scrivo ogni giorno  ' })).toBe('scrivo ogni giorno')
+  })
+  it('falls back to the legacy se-allora when there is no pactText', () => {
+    expect(pactDisplay({ trigger: 'apro il laptop', action: 'scrivo una riga' })).toBe(
+      'Se apro il laptop, allora scrivo una riga.',
+    )
+  })
+  it('is empty when nothing is set', () => {
+    expect(pactDisplay({})).toBe('')
   })
 })
 

@@ -16,6 +16,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import Sentiero from '../Progress/Sentiero'
 import MechanismCards from '../Mechanisms/MechanismCards'
 import AnimatedNumber from '../../components/AnimatedNumber'
+import { pactDisplay } from '../../lib/types'
 import type { DerivedState, Patto } from '../../lib/types'
 import { EASE } from '../../lib/motion'
 import styles from './Daily.module.css'
@@ -88,9 +89,7 @@ export default function Daily({ patto, derived, now, onShip }: DailyProps) {
       <div className={styles.inner}>
         <span className={styles.protocol}>{patto.protocolName}</span>
 
-        <h1 className={styles.pact}>
-          Se <em>{patto.trigger}</em>, allora <em>{patto.action}</em>.
-        </h1>
+        <h1 className={styles.pact}>{pactDisplay(patto)}</h1>
 
         <div className={styles.sentieroWrap}>
           <Sentiero nodes={derived.nodes} shippedCount={derived.shippedCount} />

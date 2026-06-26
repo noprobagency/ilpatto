@@ -106,36 +106,24 @@
 
 .textarea {
   resize: none;
-  min-height: 84px;
-  line-height: 1.45;
-}
-
-/* Live preview of the pact forming */
-.preview {
-  font-size: 1.15rem;
+  min-height: 104px;
   line-height: 1.5;
-  color: var(--text-secondary);
-  padding: var(--space-4);
-  background: var(--accent-faint);
-  border-radius: var(--radius);
-  letter-spacing: var(--tracking-tight);
-}
-
-.preview em {
-  font-style: normal;
-  font-weight: 600;
-  color: var(--accent-ink);
-}
-
-.previewPlaceholder {
-  color: var(--text-faint);
-  font-weight: 500;
 }
 
 .micro {
   font-size: var(--fs-sm);
   line-height: 1.5;
   color: var(--text-secondary);
+}
+
+/* The fixed reminder under the pact field — reframes the 14 days as a start */
+.reminder {
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding: var(--space-4);
+  background: var(--accent-faint);
+  border-radius: var(--radius);
 }
 
 /* Seal step — the commitment */
@@ -162,17 +150,6 @@
   font-weight: 600;
   letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
-}
-
-.summaryPact em {
-  font-style: normal;
-  color: var(--accent-ink);
-}
-
-.summaryWhy {
-  font-size: var(--fs-sm);
-  color: var(--text-secondary);
-  font-style: italic;
 }
 
 .warning {
@@ -257,18 +234,6 @@
 
 .spacer {
   flex: 1;
-}
-
-.skip {
-  background: transparent;
-  color: var(--text-faint);
-  font-size: var(--fs-sm);
-  padding: 6px 8px;
-  border-radius: var(--radius-sm);
-}
-
-.skip:hover {
-  color: var(--text-secondary);
 }
 
 @media (max-width: 520px) {

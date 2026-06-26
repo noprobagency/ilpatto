@@ -5,6 +5,7 @@
  */
 
 import { useRef, useState } from 'react'
+import { pactDisplay } from '../../lib/types'
 import type { Patto } from '../../lib/types'
 import styles from './MechanismCards.module.css'
 
@@ -84,7 +85,7 @@ export default function MechanismCards({ patto }: { patto: Patto }) {
             <p className={styles.body}>{m.body}</p>
             {m.injectPact && (
               <p className={styles.pactCallout}>
-                Tu hai un patto: <em>Se {patto.trigger}, allora {patto.action}.</em>
+                Tu hai un patto: <em>{pactDisplay(patto)}</em>
               </p>
             )}
           </article>

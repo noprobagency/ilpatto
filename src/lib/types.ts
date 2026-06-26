@@ -20,11 +20,11 @@ export interface Patto {
   version: 1
   /** "Il Patto" or a custom name. */
   protocolName: string
-  /** The "Se ___" part — the fixed trigger. */
-  trigger: string
-  /** The "allora ___" part — the minimum gesture. */
-  action: string
-  /** Optional identity framing — "perché lo faccio / chi voglio diventare". */
+  /** The pact in the user's own words — primary since v1.1 (free text). */
+  pactText?: string
+  /** Legacy v1 se-allora fields — optional, kept only for retro-compatibility. */
+  trigger?: string
+  action?: string
   why?: string
   /** Fixed at 14 in v1. */
   durationDays: typeof DURATION_DAYS
@@ -77,10 +77,23 @@ export interface DerivedState {
   nextUnlock: Date
 }
 
-/** Fields the onboarding flow collects before sealing (PRD §6.1). */
+/** Fields the onboarding flow collects before sealing (v1.1: free-text pact). */
 export interface SealInput {
   protocolName: string
-  trigger: string
-  action: string
-  why?: string
+  pactText: string
+}
+
+/**
+ * The pact to display: the user's own words (v1.1+), or — for legacy v1 pattos —
+ * the se-allora fields composed into a sentence.
+ */
+export function pactDisplay(
+  p: Pick<Patto, 'pactText' | 'trigger' | 'action'>,
+): string {
+  const text = p.pactText?.trim()
+  if (text) return text
+  if (p.trigger?.trim() && p.action?.trim()) {
+    return `Se ${p.trigger.trim()}, allora ${p.action.trim()}.`
+  }
+  return p.trigger?.trim() || p.action?.trim() || ''
 }

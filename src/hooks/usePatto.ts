@@ -24,6 +24,7 @@ import {
   loadPatto,
   savePatto,
 } from '../lib/storage'
+import { pactDisplay } from '../lib/types'
 import type { DerivedState, Patto, SealInput } from '../lib/types'
 import { useDayClock } from './useDayClock'
 
@@ -96,12 +97,7 @@ export function usePatto(): UsePatto {
     setPattoState((current) => {
       if (!current) return current
       const next = createSealedPatto(
-        {
-          protocolName: current.protocolName,
-          trigger: current.trigger,
-          action: current.action,
-          ...(current.why ? { why: current.why } : {}),
-        },
+        { protocolName: current.protocolName, pactText: pactDisplay(current) },
         now,
       )
       savePatto(next)

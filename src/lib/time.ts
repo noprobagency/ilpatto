@@ -193,20 +193,16 @@ export function evaluate(patto: Patto, now: Date): DerivedState {
  * sliver into Day 1 so a Ship at seal time still counts.
  */
 export function createSealedPatto(input: SealInput, now: Date): Patto {
-  const why = input.why?.trim()
-  const patto: Patto = {
+  return {
     version: 1,
     protocolName: input.protocolName.trim() || 'Il Patto',
-    trigger: input.trigger.trim(),
-    action: input.action.trim(),
+    pactText: input.pactText.trim(),
     durationDays: DURATION_DAYS,
     startPattoDate: toLocalISODate(now),
     lastShippedPattoDate: null,
     shippedCount: 0,
     status: 'active',
   }
-  if (why) patto.why = why
-  return patto
 }
 
 /**

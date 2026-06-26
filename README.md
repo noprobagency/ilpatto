@@ -39,7 +39,7 @@ npm run dev          # server di sviluppo (http://localhost:5173)
 src/
   components/   AnimatedNumber (contagiorni fluido)
   features/
-    Onboarding/ flusso se-allora in 4 step + sigillo
+    Onboarding/ flusso minimale: nome → patto (campo libero) → sigillo
     Daily/      schermata principale: patto + Sentiero + card + bottone Ship
     Progress/   Sentiero.tsx — i 14 nodi (curva su desktop, salita verticale su mobile)
     Mechanisms/ le 3 card meccanismo (carosello; la Card 1 inietta il patto)
@@ -74,6 +74,14 @@ chiusure, riavvii, riaperture a distanza di giorni, offline.
   `lastShippedPattoDate` → `active` / `shipped-today` / `broken` (gap > 1) /
   `completed` (14 ship). Gli stati terminali sono congelati.
 - Testato falsificando le date in `src/lib/time.test.ts`.
+
+### Il patto: `pactText`
+
+Dalla v1.1 il patto è **testo libero** scritto dall'utente (`pactText` nel modello
+`Patto`). I vecchi campi `trigger`/`action` (v1, formato «se-allora») restano
+opzionali solo per retrocompatibilità con i patti già salvati. Per mostrare il
+patto usa sempre `pactDisplay(patto)` ([`src/lib/types.ts`](src/lib/types.ts)):
+ritorna il testo libero, o — per i patti legacy — compone «Se …, allora …».
 
 ### Cambiare l'accento (una riga)
 

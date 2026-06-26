@@ -28,8 +28,10 @@ function isValidPatto(value: unknown): value is Patto {
   return (
     p.version === 1 &&
     typeof p.protocolName === 'string' &&
-    typeof p.trigger === 'string' &&
-    typeof p.action === 'string' &&
+    // Pact fields are all optional/legacy — accept string-or-absent for each.
+    (p.pactText === undefined || typeof p.pactText === 'string') &&
+    (p.trigger === undefined || typeof p.trigger === 'string') &&
+    (p.action === undefined || typeof p.action === 'string') &&
     typeof p.durationDays === 'number' &&
     typeof p.startPattoDate === 'string' &&
     (p.lastShippedPattoDate === null || typeof p.lastShippedPattoDate === 'string') &&

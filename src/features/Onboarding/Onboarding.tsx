@@ -1,12 +1,13 @@
 /*
- * Onboarding (PRD §6.1, §2). A few light steps — never a wall of fields:
- *   1. Protocol name
- *   2. The pact in if-then form (the single biggest lever — implementation
- *      intentions), with the sentence forming live
- *   3. Why / identity framing (optional, one line)
- *   4. The seal: summary + the honest warning + "Sigillo il patto"
+ * Onboarding (v1.1) — lean. Three light steps, no wall of fields:
+ *   1. Name
+ *   2. The pact — a single FREE-TEXT field (the user writes it in their own
+ *      words), with a fixed reminder that the goal isn't reaching day 14, it's
+ *      starting.
+ *   3. The seal: summary + the honest warning + "Sigillo il patto".
  *
- * Tone: "io sono uno che spedisce", not "obbedisci o perdi" (PRD §2).
+ * (The old "Se ___ / allora ___" split and the optional "why" page are gone.)
+ * Tone: "io sono uno che spedisce", not "obbedisci o perdi".
  */
 
 import { useState } from 'react'
@@ -15,7 +16,7 @@ import type { SealInput } from '../../lib/types'
 import { EASE } from '../../lib/motion'
 import styles from './Onboarding.module.css'
 
-const STEP_COUNT = 4
+const STEP_COUNT = 3
 
 interface OnboardingProps {
   onSeal: (input: SealInput) => void
@@ -26,11 +27,9 @@ export default function Onboarding({ onSeal }: OnboardingProps) {
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState(1)
   const [protocolName, setProtocolName] = useState('Il Patto')
-  const [trigger, setTrigger] = useState('')
-  const [action, setAction] = useState('')
-  const [why, setWhy] = useState('')
+  const [pactText, setPactText] = useState('')
 
-  const pactReady = trigger.trim().length > 0 && action.trim().length > 0
+  const pactReady = pactText.trim().length > 0
   const canAdvance = step === 1 ? pactReady : true
 
   const move = (dir: 1 | -1) => {
@@ -39,19 +38,19 @@ export default function Onboarding({ onSeal }: OnboardingProps) {
   }
   const next = () => canAdvance && move(1)
   const back = () => move(-1)
-  const seal = () =>
-    onSeal({
-      protocolName,
-      trigger,
-      action,
-      ...(why.trim() ? { why: why.trim() } : {}),
-    })
+  const seal = () => onSeal({ protocolName, pactText })
 
+  // Enter advances on single-line steps; the pact textarea keeps Enter for newlines.
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key !== 'Enter') return
     e.preventDefault()
     if (step < STEP_COUNT - 1) next()
     else seal()
+  }
+
+  const variants = {
+    initial: { opacity: 0, x: reduce ? 0 : direction * 28 },
+    animate: { opacity: 1, x: 0 },
   }
 
   return (
@@ -70,187 +69,129 @@ export default function Onboarding({ onSeal }: OnboardingProps) {
 
         <motion.div
           key={step}
-          initial={{ opacity: 0, x: reduce ? 0 : direction * 28 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={variants.initial}
+          animate={variants.animate}
           transition={{ duration: 0.28, ease: EASE }}
           className={styles.step}
         >
-            <span className={styles.kicker}>
-              Passo {step + 1} di {STEP_COUNT}
-            </span>
+          <span className={styles.kicker}>
+            Passo {step + 1} di {STEP_COUNT}
+          </span>
 
-            {step === 0 && (
-              <>
-                <h1 className={styles.title}>Come si chiama il tuo patto?</h1>
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="protocolName">
-                    Nome del protocollo
-                  </label>
-                  <input
-                    id="protocolName"
-                    className={styles.input}
-                    value={protocolName}
-                    onChange={(e) => setProtocolName(e.target.value)}
-                    onKeyDown={handleKey}
-                    onFocus={(e) => e.target.select()}
-                    maxLength={40}
-                    autoFocus
-                  />
-                </div>
-                <p className={styles.micro}>
-                  Un nome è già un impegno. Tieni «Il Patto» o scegline uno tuo —
-                  «Indie 14», «Ship Daily».
-                </p>
-              </>
-            )}
-
-            {step === 1 && (
-              <>
-                <h1 className={styles.title}>Scrivi il tuo impegno</h1>
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="trigger">
-                    Se…
-                  </label>
-                  <input
-                    id="trigger"
-                    className={styles.input}
-                    value={trigger}
-                    onChange={(e) => setTrigger(e.target.value)}
-                    onKeyDown={handleKey}
-                    placeholder="apro il laptop la mattina"
-                    maxLength={80}
-                    autoFocus
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="action">
-                    allora…
-                  </label>
-                  <input
-                    id="action"
-                    className={styles.input}
-                    value={action}
-                    onChange={(e) => setAction(e.target.value)}
-                    onKeyDown={handleKey}
-                    placeholder="scrivo una riga di codice"
-                    maxLength={80}
-                  />
-                </div>
-                <p className={styles.preview}>
-                  Se{' '}
-                  {trigger.trim() ? (
-                    <em>{trigger.trim()}</em>
-                  ) : (
-                    <span className={styles.previewPlaceholder}>…</span>
-                  )}
-                  , allora{' '}
-                  {action.trim() ? (
-                    <em>{action.trim()}</em>
-                  ) : (
-                    <span className={styles.previewPlaceholder}>…</span>
-                  )}
-                  .
-                </p>
-                <p className={styles.micro}>
-                  Aggancia il gesto a un segnale fisso che hai già ogni giorno. È il
-                  segnale a tirare l'azione — non la voglia.
-                </p>
-              </>
-            )}
-
-            {step === 2 && (
-              <>
-                <h1 className={styles.title}>Perché lo fai?</h1>
-                <div className={styles.field}>
-                  <label className={styles.label} htmlFor="why">
-                    Chi vuoi diventare <span style={{ fontWeight: 400 }}>(facoltativo)</span>
-                  </label>
-                  <input
-                    id="why"
-                    className={styles.input}
-                    value={why}
-                    onChange={(e) => setWhy(e.target.value)}
-                    onKeyDown={handleKey}
-                    placeholder="uno che spedisce, ogni giorno"
-                    maxLength={100}
-                    autoFocus
-                  />
-                </div>
-                <p className={styles.micro}>
-                  Una riga. Non un risultato da raggiungere: un'identità da abitare.
-                </p>
-              </>
-            )}
-
-            {step === 3 && (
-              <>
-                <h1 className={styles.title}>Sigilla il patto</h1>
-                <div className={styles.summary}>
-                  <span className={styles.summaryName}>
-                    {protocolName.trim() || 'Il Patto'}
-                  </span>
-                  <p className={styles.summaryPact}>
-                    Se <em>{trigger.trim()}</em>, allora <em>{action.trim()}</em>.
-                  </p>
-                  {why.trim() && (
-                    <p className={styles.summaryWhy}>« {why.trim()} »</p>
-                  )}
-                </div>
-                <p className={styles.warning}>
-                  <span className={styles.warnDot} aria-hidden="true" />
-                  <span>
-                    <strong>14 giorni.</strong> Ogni giorno rileggi i meccanismi e
-                    premi Ship. Salti un giorno e il percorso si chiude.
-                  </span>
-                </p>
-              </>
-            )}
-
-            {/* Per-step navigation */}
-            {step < 3 ? (
-              <div className={styles.nav}>
-                {step > 0 ? (
-                  <button
-                    type="button"
-                    className={`${styles.btn} ${styles.btnGhost}`}
-                    onClick={back}
-                  >
-                    Indietro
-                  </button>
-                ) : (
-                  <span className={styles.spacer} />
-                )}
-                <button
-                  type="button"
-                  className={`${styles.btn} ${styles.btnPrimary}`}
-                  onClick={next}
-                  disabled={!canAdvance}
-                >
-                  Avanti
-                </button>
-              </div>
-            ) : (
-              <div className={styles.step}>
-                <button
-                  type="button"
-                  className={`${styles.btn} ${styles.btnPrimary} ${styles.btnSeal}`}
-                  onClick={seal}
+          {step === 0 && (
+            <>
+              <h1 className={styles.title}>Come si chiama il tuo patto?</h1>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="protocolName">
+                  Nome del protocollo
+                </label>
+                <input
+                  id="protocolName"
+                  className={styles.input}
+                  value={protocolName}
+                  onChange={(e) => setProtocolName(e.target.value)}
+                  onKeyDown={handleKey}
+                  onFocus={(e) => e.target.select()}
+                  maxLength={40}
                   autoFocus
-                >
-                  Sigillo il patto
-                </button>
-                <div className={styles.nav} style={{ marginTop: 0 }}>
-                  <button
-                    type="button"
-                    className={`${styles.btn} ${styles.btnGhost}`}
-                    onClick={back}
-                  >
-                    Indietro
-                  </button>
-                  <span className={styles.spacer} />
-                </div>
+                />
               </div>
-            )}
+              <p className={styles.micro}>
+                Un nome è già un impegno. Tieni «Il Patto» o scegline uno tuo —
+                «Indie 14», «Ship Daily».
+              </p>
+            </>
+          )}
+
+          {step === 1 && (
+            <>
+              <h1 className={styles.title}>Scrivi il tuo patto</h1>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="pactText">
+                  L'impegno con te stesso
+                </label>
+                <textarea
+                  id="pactText"
+                  className={`${styles.input} ${styles.textarea}`}
+                  value={pactText}
+                  onChange={(e) => setPactText(e.target.value)}
+                  placeholder="Ogni giorno, per 14 giorni, io… (anche solo 10 minuti)"
+                  maxLength={280}
+                  rows={3}
+                  autoFocus
+                />
+              </div>
+              <p className={styles.reminder}>
+                Ricorda: l'obiettivo non è arrivare a 14 giorni. È iniziare. A 14
+                giorni non hai costruito l'abitudine — hai superato la parte in cui
+                la maggior parte molla. Il vero percorso comincia lì.
+              </p>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <h1 className={styles.title}>Sigilla il patto</h1>
+              <div className={styles.summary}>
+                <span className={styles.summaryName}>
+                  {protocolName.trim() || 'Il Patto'}
+                </span>
+                <p className={styles.summaryPact}>{pactText.trim()}</p>
+              </div>
+              <p className={styles.warning}>
+                <span className={styles.warnDot} aria-hidden="true" />
+                <span>
+                  <strong>14 giorni.</strong> Ogni giorno rileggi i meccanismi e
+                  premi Ship. Salti un giorno e il percorso si chiude.
+                </span>
+              </p>
+            </>
+          )}
+
+          {step < STEP_COUNT - 1 ? (
+            <div className={styles.nav}>
+              {step > 0 ? (
+                <button
+                  type="button"
+                  className={`${styles.btn} ${styles.btnGhost}`}
+                  onClick={back}
+                >
+                  Indietro
+                </button>
+              ) : (
+                <span className={styles.spacer} />
+              )}
+              <button
+                type="button"
+                className={`${styles.btn} ${styles.btnPrimary}`}
+                onClick={next}
+                disabled={!canAdvance}
+              >
+                Avanti
+              </button>
+            </div>
+          ) : (
+            <div className={styles.step}>
+              <button
+                type="button"
+                className={`${styles.btn} ${styles.btnPrimary} ${styles.btnSeal}`}
+                onClick={seal}
+                autoFocus
+              >
+                Sigillo il patto
+              </button>
+              <div className={styles.nav} style={{ marginTop: 0 }}>
+                <button
+                  type="button"
+                  className={`${styles.btn} ${styles.btnGhost}`}
+                  onClick={back}
+                >
+                  Indietro
+                </button>
+                <span className={styles.spacer} />
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </main>

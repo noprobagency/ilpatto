@@ -14,6 +14,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import Sentiero from '../Progress/Sentiero'
+import { pactDisplay } from '../../lib/types'
 import type { DerivedState, Patto } from '../../lib/types'
 import { EASE } from '../../lib/motion'
 import styles from './EndStates.module.css'
@@ -69,7 +70,7 @@ export default function Broken({ patto, derived, onRestartSamePact }: BrokenProp
             Riparti dai 14
           </motion.button>
           <p className={styles.pactReminder}>
-            Lo stesso patto, da capo: <em>Se {patto.trigger}, allora {patto.action}.</em>
+            Lo stesso patto, da capo: <em>{pactDisplay(patto)}</em>
           </p>
         </motion.div>
       </div>
